@@ -10,6 +10,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { platform } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import { Link } from "react-router-dom";
 
 function App() {
   const [currentOS, setCurrentOS] = useState<string>("");
@@ -22,7 +23,7 @@ function App() {
     const currentPlatform = platform();
     setCurrentOS(currentPlatform);
     // ウィンドウクローズ時の処理
-    const unlisten = appWindow.onCloseRequested(async (event) => {
+    const unListen = appWindow.onCloseRequested(async (event) => {
       // macOSの場合は確認ダイアログを表示
       if ((await platform()) === "macos") {
         const confirmed = window.confirm("アプリケーションを終了しますか？");
@@ -32,7 +33,7 @@ function App() {
       }
     });
     return () => {
-      unlisten.then((fn) => fn());
+      unListen.then((fn) => fn());
     };
   }, []);
 
@@ -56,24 +57,24 @@ function App() {
   // }
   // };
 
-  // const showNativeDialog = async () => {
-  //   try {
-  //     const permissionGranted = await isPermissionGranted();
-  //     if (!permissionGranted) {
-  //       const permission = await requestPermission();
-  //       if (permission !== "granted") {
-  //         return;
-  //       }
-  //     }
+  const showNativeDialog = async () => {
+    try {
+      const permissionGranted = await isPermissionGranted();
+      if (!permissionGranted) {
+        const permission = await requestPermission();
+        if (permission !== "granted") {
+          return;
+        }
+      }
 
-  //     await sendNotification({
-  //       title: "OS固有の通知",
-  //       body: `この通知は ${currentOS} 向けにネイティブ表示されています`,
-  //     });
-  //   } catch (error) {
-  //     console.error("通知エラー:", error);
-  //   }
-  // };
+      await sendNotification({
+        title: "Tauri アプリケーション",
+        body: `この通知は ${currentOS} 向けにネイティブ表示されています`,
+      });
+    } catch (error) {
+      console.error("通知エラー:", error);
+    }
+  };
 
   // const showFileDialog = async () => {
   //   try {
@@ -100,7 +101,7 @@ function App() {
       <h1 className="text-2xl mb-4">Tauri クロスプラットフォームデモ</h1>
       <p className="mb-4">現在のOS: {currentOS}</p>
 
-      <div className="space-y-4">
+      <div className="flex gap-4">
         <button
           // onClick={createNewWindow}
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -109,7 +110,7 @@ function App() {
         </button>
 
         <button
-          // onClick={showNativeDialog}
+          onClick={showNativeDialog}
           className="bg-green-500 text-white px-4 py-2 rounded block"
         >
           ネイティブ通知を表示
@@ -122,6 +123,7 @@ function App() {
           ファイル選択ダイアログを表示
         </button>
       </div>
+      <Link to="/about">About</Link>
     </div>
   );
 }
